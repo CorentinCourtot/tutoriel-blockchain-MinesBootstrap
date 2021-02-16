@@ -5,14 +5,14 @@ from key import verify_signature
 
 
 class Block:
-    def __init__(self, index: int = 0, lasthash: str = "", timestamp=0, minerName: str = ""):
+    def __init__(self, index: int = 0, lasthash: str = "", timestamp=0, miner: str = ""):
         self.transactions: list[Transaction] = []
         self.index = index
         self.hashval = ""
         self.lasthash = lasthash
         self.timestamp = timestamp
         self.nonce = 0
-        self.minerName = ""
+        self.miner = ""
 
     def __repr__(self):
         string = "Block number: " + str(self.index) + "\n" + \
@@ -20,7 +20,7 @@ class Block:
                  "last hash: " + str(self.lasthash) + "\n" + \
                  "Nonce: " + str(self.nonce) + "\n" + \
                  "Timestamp: " + str(self.timestamp) + "\n" \
-                 "Miner name: " + self.minerName + "\n"
+                 "Miner name: " + self.miner + "\n"
         return string
 
     def add_transaction(self, t: Transaction):
@@ -43,9 +43,22 @@ class Block:
 
     def mine(self, difficulty: int = 0):
         self.timestamp = time.time()
-        self.minerName = "Corentin C"
+        self.miner = "Corentin C"
 
         while not(self.hash().startswith("0" * difficulty)):
             self.nonce += 1
 
         self.hashval = self.hash()
+
+    def to_dict(self):
+        block_dict = {}
+        block_dict["index"] = self.index
+        block_dict["nonce"] = self.nonce
+        block_dict["timestamp"] = self.timestamp
+        block_dict["miner"] = self.miner
+        block_dict["transactions"] = []
+        for elem in self.transactions:
+            block_dict["transactions"].append(elem.to_dict())
+        block_dict["previous_hash"] = self.lasthash
+        block_dict["hashval"] = self.hashval
+        return block_dict
